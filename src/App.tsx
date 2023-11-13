@@ -94,13 +94,13 @@ interface ButtonType {
 function App() {
   
   const [carriers, setCarriers] = useState<Company[]>([]);
-  // 필터되는부분
+  // 밑에  필터된 값을 넣을겁니다
   const [allCarriers, setAllCarriers] = useState<Company[]>([]);
-  // 전체
+  // 전체값(필터되는)
   const [theme, setTheme] = useState<string>('default');
-
-  const [tCode, setTcode] = useState<string>('04');
-  const [tinvoice, setTinvoce] =useState<string>('');
+  //객체 안에 객체
+  const [tCode, setTcode] = useState<string>('04'); // 대한통운이여서 04 입력
+  const [tinvoice, setTinvoce] =useState<string>(''); // 실제 운송장 번호
   const [tname, setTname] = useState<string>('CJ대한통운');
   const [isBtn, setIsBtn] = useState<number |null>(null);
   const [infoTracking, setInfoTracking] = useState<PackageData | null>(null);
@@ -109,7 +109,7 @@ function App() {
   const [isShow, setIsShow] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
-
+  //기본  테마값 dafault
   const themeColor : ThemeColor={
     "default":{ 
       "back": "bg-indigo-500",
@@ -145,7 +145,7 @@ function App() {
       "rgb" : "#0ea5e9"
     }
   }
-  // 디폴트 기본테마값
+  
 
   const buttons :ButtonType[]= [
     {name: "기본", theme: "default"},
@@ -179,6 +179,7 @@ function App() {
     setIsBtn(BtnNumber);
     setTcode(code);
     setTname(name);
+    //국내,외 필터 true는 외국 false는 국내택배 입니다. 
     const isInternational = BtnNumber === 2? 'true' : 'false';
     const filterCarriers = allCarriers.filter((e) => e.International === isInternational);
     setCarriers(filterCarriers)
@@ -196,7 +197,7 @@ function App() {
     setTinvoce(value);
   }
   // 위의 코드는 숫자를 제외한 모든 문자를 제거후, 숫자만을 setTinvoce 함수를 통해 설정합니다.
-  // 이를 통해서 입력칸에 숫자만 입력할 수 있도록 필터링 해줍니다.
+  // 이를 통해서 입력칸에 숫자만 입력할 수 있도록 필터링 해줍니다. 0~9까지 숫자만 입력가능하게
   const PostSumbmit = async ()=>{
     setIsLoading(true);
     setIsShow(false);
@@ -316,9 +317,7 @@ function App() {
         <span className='basis-[30%] text-center mr-5'>국내 / 국외선택</span>
 
         <button onClick={()=> selectCode(1, '04','CJ대한통운')}className={`text-sm border p-1 px-5 rounded hover:text-white mr-4 ${isBtn === 1? 'text-white' : 'text-black'} ${themeColor[theme].hover} ${isBtn === 1 && themeColor[theme].active}`}>국내</button>
-        {/* 국내 택배사 첫번째부터 목록 */}
-        <button onClick={()=> selectCode(2, '12','EMS')}className={`text-sm border p-1 px-5 rounded hover:text-white mr-4 ${isBtn === 2? 'text-white' : 'text-black'} ${themeColor[theme].hover} ${isBtn === 2 && themeColor[theme].active}`}>국외</button>
-        {/* 국외 택배사 첫번째부터 목록 */}
+        <button onClick={()=> selectCode(2, '12','EMS')}className={`text-sm border p-1 px-5 rounded hover:text-white mr-4 ${isBtn === 2? 'text-white' : 'text-black'} ${themeColor[theme].hover} ${isBtn === 2 && themeColor[theme].active}`}>국외</button>   
       </div>
       <span className='basis-full py-4 border-b'></span>
       <select className='w-full border p-2 rounded-md'value={tCode} onChange={(e)=>{
@@ -356,54 +355,48 @@ function App() {
       
       </div>
      
-       {
-       isShow && 
-        <>
-        <div className="w-full">
-          <div className={`${themeColor[theme].back} text-white flex justify-center py-10 px-5 flex-wrap items-center text-center`}>
-            <span className="text-xl basis-[45%] font-bold mb-5">운송장 번호</span>
-            <h3 className="text-2xl basis-[45%] font-bold mb-5">{tinvoice}</h3>
-            <span className="text-xl basis-[45%] font-bold mb-5">택배사</span>
-            <h3 className="text-2xl basis-[45%] font-bold mb-5">{tname}</h3>
-          </div>
+      {
+      isShow &&
+      <>
+      <div className="w-full">
+        <div className={`${themeColor[theme].back} text-white flex justify-center py-10 px-5 flex-wrap items-center text-center`}>
+          <span className="text-xl basis-[45%] font-bold mr-5 mb-5">운송장 번호</span>
+          <h3 className="text-2xl basis-[45%] font-bold mb-5">{tinvoice}</h3>
+          <span className="text-xl basis-[45%] font-bold mr-5 mb-5">택배사</span>
+          <h3 className="text-2xl basis-[45%] font-bold mb-5">{tname}</h3>
         </div>
-          <div className="bg-white my-5 flex justify-around py-5 relative before:absolute before:bg=[#e2e5e8] before:h-0.5 before:box-border before:top-[45%] before:left-[10%] before:w-4/5 before:z-0">
-            {
-              Array(5).fill('').map((_,i)=>{
-                const resultLevel = infoTracking && i + 1 === (infoTracking?.level - 1);
-                return(
-                      <div  key={i} className={`${infoTracking&&resultLevel ? themeColor[theme].after : 'after:bg-gray-200'} relative z-10 after:absolute after:w [60px] after:h-[60px] after:rounded-full after:left-0 after:top-0`}>
-                        <img  className="relative z-10"src={`images/ic_sky_delivery_step${i+1}_on.png`} alt={PostListName[i]} />
-                        
-                        <p className='text-center text-xs mt-1'>
-                          {PostListName[i]}</p>
-                          {/* 레벨의 글자 > 테마의 색상 + 글자 진하게 */}
-                      </div>                  
-                )
-              })
-            }
-            </div>
-            <div className="bg-white py-5">
-              {
-                infoTracking && infoTracking.trackingDetails.slice().reverse().map((e,i)=>{
-                  return(
-                    
-                    <div className={`pl-20 py-5 relative group ${themeColor[theme].odd}`} key={i}>
-                    <div className={`${i === 0 ? `${themeColor[theme].back}${themeColor[theme].border}` : `bg-white`}relative border-2 rounded-full w-2 h-2 left-[30px] top-10 z-30`}></div>
-                    <p>{e.where} | {e.kind}</p>
-                    <p>{e.telno}</p>
-                    <p>{e.timeString}</p>
-                    <div className={`group-last:h-0 h-full absolute w-0.5 left-[53px] top-[53px] z-20 ${themeColor[theme].back}`}></div>
-                    </div>
-                    
-                  )
-                })
-              }
-            </div>
-            </>
-       }
-      
-  </>
+      </div>
+      <div className="bg-white my-5 flex justify-around py-5 relative before:bg-[#e2e5e8] before:absolute before:h-1 before:box-border before:top-[45%] before:left-[10%] before:w-4/5 before:z-0">
+        {
+          Array(5).fill('').map((_,i)=>{
+            const resultLevel = infoTracking && i + 1 === (infoTracking?.level -1);
+            return(
+              <div className={`${resultLevel ? themeColor[theme].after : `after:bg-gray-200`} relative z-10 after:absolute after:w-[60px] after:h-[60px] after:rounded-full after:top-0 after:left-0`} key={i}>
+                <img className='relative z-10' src={`images/ic_sky_delivery_step${i+1}_on.png`} alt={PostListName[i]} />
+                <p className='text-center text-xs mt-1'>{PostListName[i]}</p>
+              </div>
+            )
+          })
+        }
+      </div>
+      <div className="bg-white py-5">
+        {
+          infoTracking && infoTracking.trackingDetails.slice().reverse().map((e,i)=>{
+            return(
+              <div className={`pl-20 py-5 relative group ${themeColor[theme].odd}`} key={i}>
+                <div className={`relative border-2 rounded-full w-2 h-2 -left-[30px] top-10 z-30 ${i === 0 ? `${themeColor[theme].border} ${themeColor[theme].back}` : `bg-white`}`}></div>
+                <p className="">{e.where} | {e.kind}</p>
+                <p className="">{e.telno}</p>
+                <p className="">{e.timeString}</p>
+                <div className={`group-last:h-0 h-full absolute w-0.5 left-[53px] top-[60px] z-20 ${themeColor[theme].back}`}></div>
+              </div>
+            )
+          })
+        }
+      </div>
+      </>
+    }
+    </>
   );
 }
 
